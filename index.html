@@ -52,7 +52,7 @@ html,body{height:100%;overflow-x:hidden}
 body{font-family:'DM Sans',system-ui,sans-serif;transition:background .3s,color .3s}
 body.dark{background:#0f172a;color:#fff}
 body.light{background:#f1f5f9;color:#1e293b}
-#app{max-width:420px;margin:0 auto;min-height:100vh;position:relative;background:#0f172a}
+#app{max-width:420px;margin:0 auto;min-height:100vh;position:relative}
 .scr{display:none;min-height:100vh}
 .scr.on{display:block}
 /* Header */
@@ -99,39 +99,7 @@ body.light{background:#f1f5f9;color:#1e293b}
 /* Login */
 .login-wrap{min-height:100vh;background:linear-gradient(160deg,#0f172a,#1e3a5f);display:flex;align-items:center;justify-content:center;padding:20px}
 .login-card{width:100%;max-width:360px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:26px}
-
-/* ── RESPONSYWNOŚĆ ── */
-@media(min-width:700px){
-  #app{max-width:100vw}
-  #app > .scr{max-width:100vw}
-  #home-inner{max-width:900px;margin:0 auto;padding:0 24px 40px}
-  .home-cards-grid{
-    display:grid!important;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px
-  }
-}
-@media(min-width:1100px){
-  #home-inner{max-width:1200px}
-  .home-cards-grid{
-    grid-template-columns:repeat(4,1fr)!important
-  }
-}
-/* Każdy tracker screen też wyśrodkowany na dużym ekranie */
-@media(min-width:700px){
-  #s-finance,#s-invest,#s-workout,#s-goals,#s-settings{
-    max-width:100vw
-  }
-  #s-finance .hdr,#s-invest .hdr,#s-workout .hdr,#s-goals .hdr,#s-settings .hdr{
-    max-width:860px;margin:0 auto
-  }
-  #s-finance .scr-pad,#s-invest .scr-pad,#s-workout .scr-pad,#s-goals .scr-pad,#s-settings .scr-pad{
-    max-width:860px;margin:0 auto;padding:20px 24px 60px
-  }
-  .ov{align-items:center}
-  .mod,.mod-d{max-width:500px;border-radius:18px}
-}
-</style>
+@media(min-width:700px){#hcards{display:grid!important;grid-template-columns:repeat(2,1fr);gap:12px!important}}@media(min-width:1100px){#hcards{grid-template-columns:repeat(4,1fr)!important}}</style>
 </head>
 <body class="dark">
 <div id="app">
@@ -176,13 +144,18 @@ body.light{background:#f1f5f9;color:#1e293b}
         <button onclick="doLogout()" style="background:rgba(255,255,255,0.07);border:none;border-radius:10px;padding:8px 10px;cursor:pointer;color:rgba(255,255,255,0.5);font-size:12px;font-family:inherit">Wyloguj</button>
       </div>
     </div>
-    <div id="w-desc" style="font-size:11px;opacity:.5">Warszawa</div></div>
+    <div id="weather-box" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px" id="w-icon">⏳</span>
+      <div><div id="w-temp" style="font-size:14px;font-weight:700">Ładowanie...</div><div id="w-desc" style="font-size:11px;opacity:.5">Warszawa</div></div>
     </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:11px;padding:10px 13px">
+      <span style="font-size:15px;margin-right:7px">◎</span><span style="font-size:13px;font-weight:700">Twój Tracker</span>
+      <div style="font-size:11px;opacity:.38;margin-top:2px">Finanse · Inwestycje · Trening · Cele</div>
     </div>
   </div>
-  <div id="home-inner">
-    <p style="font-size:11px;font-weight:700;opacity:.3;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;padding:0 4px">Twoje trackery</p>
-    <div id="hcards" class="home-cards-grid" style="display:flex;flex-direction:column;gap:12px"></div>
+  <div style="padding:0 14px 40px">
+    <p style="font-size:11px;font-weight:700;opacity:.3;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">Twoje trackery</p>
+    <div id="hcards" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 </div>
 
@@ -488,9 +461,9 @@ function renderHome(){
   const td=tasks.filter(t=>t.planDate===today());
   const cards=[
     {id:"finance",icon:"💰",title:"Tracker Finansowy",sub:`${exp.toFixed(0)} zł wydatków w tym miesiącu`,grad:"linear-gradient(135deg,#1e3a5f,#2563eb)",stat:(bal>=0?"+":"")+fmt(Math.abs(bal)),sc:bal>=0?"#86efac":"#fca5a5"},
-    {id:"invest",icon:"📈",title:"Inwestycje",sub:`Portfolio: ${fmt(invT)}`,grad:"linear-gradient(135deg,#78350f,#d97706)",stat:fmt(invT),sc:"#5eead4"},
+    {id:"invest",icon:"📈",title:"Inwestycje",sub:`Portfolio: ${fmt(invT)}`,grad:"linear-gradient(135deg,#134e4a,#0d9488)",stat:fmt(invT),sc:"#5eead4"},
     {id:"workout",icon:"🏋️",title:"Tracker Treningów",sub:`${wk} treningów w tym tygodniu`,grad:"linear-gradient(135deg,#1e1b4b,#7c3aed)",stat:`${wk} treningów`,sc:"#e9d5ff"},
-    {id:"goals",icon:"🎯",title:"Cele & Nawyki",sub:`Streak ${streak} dni · ${td.filter(t=>t.done).length}/${td.length} dziś`,grad:"linear-gradient(135deg,#4c0519,#dc2626)",stat:`${streak}d 🔥`,sc:"#86efac"},
+    {id:"goals",icon:"🎯",title:"Cele & Nawyki",sub:`Streak ${streak} dni · ${td.filter(t=>t.done).length}/${td.length} dziś`,grad:"linear-gradient(135deg,#064e3b,#10b981)",stat:`${streak}d 🔥`,sc:"#86efac"},
   ];
   document.getElementById("hcards").innerHTML=cards.map(c=>`<button onclick="go('${c.id}')" style="background:${c.grad};border:none;border-radius:16px;padding:16px 18px;cursor:pointer;text-align:left;position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,0.22);width:100%;transition:transform .12s" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform='scale(1)'"><div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:20px;margin-bottom:7px">${c.icon}</div><div style="color:#fff;font-size:15px;font-weight:800;margin-bottom:3px">${c.title}</div><div style="color:rgba(255,255,255,0.55);font-size:12px">${c.sub}</div></div><div style="text-align:right;flex-shrink:0;margin-left:10px"><div style="color:${c.sc};font-size:13px;font-weight:800">${c.stat}</div></div></div></button>`).join("");
   loadWeather();
