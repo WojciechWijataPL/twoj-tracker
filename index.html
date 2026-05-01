@@ -13,37 +13,26 @@
      FIREBASE — WKLEJ TUTAJ SWOJE DANE Z FIREBASE CONSOLE
      Instrukcja: patrz INSTRUKCJA.md
 ═══════════════════════════════════════════════════════════ -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-           signOut, onAuthStateChanged, updateProfile }
-    from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc,
-           onSnapshot, query, orderBy, serverTimestamp,
-           updateDoc, setDoc, getDoc }
-    from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script>
+  // ⚠️ TWOJE DANE FIREBASE:
   const firebaseConfig = {
     apiKey:            "AIzaSyDEzOBQJ5DF7iocXbGCT9RrO04Y6wBUf4I",
     authDomain:        "pierwszy-tracker.firebaseapp.com",
     projectId:         "pierwszy-tracker",
     storageBucket:     "pierwszy-tracker.firebasestorage.app",
     messagingSenderId: "188449164183",
-    appId:             "1:188449164183:web:24970bdb0132ed187e12d2",
-    measurementId:     "G-HGNYF2NR89"
+    appId:             "1:188449164183:web:24970bdb0132ed187e12d2"
   };
+  // ⚠️ WKLEJ SWOJE UID PO PIERWSZYM LOGOWANIU:
+  window.ADMIN_UID = "WKLEJ_SWOJE_UID";
 
-  // ⚠️ PO PIERWSZYM LOGOWANIU WKLEJ TU SWOJE UID (znajdziesz je po zalogowaniu w konsoli przeglądarki):
-  const ADMIN_UID = "WKLEJ_SWOJE_UID";
-
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  // Eksportuj do window żeby reszta kodu mogła używać
-  window._fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-    signOut, onAuthStateChanged, updateProfile, collection, addDoc, deleteDoc,
-    doc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, setDoc, getDoc, ADMIN_UID };
+  firebase.initializeApp(firebaseConfig);
+  window._auth = firebase.auth();
+  window._db   = firebase.firestore();
+  console.log("Firebase załadowany ✓");
 </script>
 
 <style>
@@ -354,24 +343,23 @@ async function doLogin(){
   const name=document.getElementById("l-name")?.value.trim()||"";
   const errEl=document.getElementById("l-err");
   const btn=document.getElementById("l-btn");
+  if(!email||!pass){errEl.textContent="Wpisz email i hasło.";errEl.style.display="block";return;}
   errEl.style.display="none";btn.textContent="⏳ Ładowanie...";btn.disabled=true;
-  if(window._fb){
-    try{
-      const {auth,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile}=window._fb;
-      let r;
-      if(lMode==="login"){r=await signInWithEmailAndPassword(auth,email,pass);}
-      else{r=await createUserWithEmailAndPassword(auth,email,pass);if(name)await updateProfile(r.user,{displayName:name});}
-      currentUser=r.user;
-      afterLogin();
-    }catch(e){
-      const msgs={"auth/wrong-password":"Błędne hasło.","auth/user-not-found":"Konto nie istnieje.","auth/email-already-in-use":"Email zajęty.","auth/weak-password":"Hasło min. 6 znaków.","auth/invalid-email":"Nieprawidłowy email.","auth/invalid-credential":"Błędny email lub hasło."};
-      errEl.textContent=msgs[e.code]||"Błąd: "+e.message;errEl.style.display="block";
-      btn.textContent=lMode==="login"?"Zaloguj się":"Utwórz konto";btn.disabled=false;
+  try{
+    const auth=window._auth;
+    let r;
+    if(lMode==="login"){
+      r=await auth.signInWithEmailAndPassword(email,pass);
+    } else {
+      r=await auth.createUserWithEmailAndPassword(email,pass);
+      if(name)await r.user.updateProfile({displayName:name});
     }
-  } else {
-    // Demo mode — brak Firebase
-    currentUser={displayName:name||email.split("@")[0],email,uid:"demo"};
+    currentUser=r.user;
     afterLogin();
+  }catch(e){
+    const msgs={"auth/wrong-password":"Błędne hasło.","auth/user-not-found":"Konto nie istnieje.","auth/email-already-in-use":"Email zajęty.","auth/weak-password":"Hasło min. 6 znaków.","auth/invalid-email":"Nieprawidłowy email.","auth/invalid-credential":"Błędny email lub hasło."};
+    errEl.textContent=msgs[e.code]||"Błąd: "+e.message;errEl.style.display="block";
+    btn.textContent=lMode==="login"?"Zaloguj się":"Utwórz konto";btn.disabled=false;
   }
 }
 
@@ -384,7 +372,7 @@ function afterLogin(){
 }
 
 async function doLogout(){
-  if(window._fb){try{await window._fb.signOut(window._fb.auth);}catch{}}
+  try{if(window._auth)await window._auth.signOut();}catch{}
   currentUser=null;
   document.querySelectorAll(".scr").forEach(s=>s.classList.remove("on"));
   document.getElementById("s-login").classList.add("on");
@@ -392,13 +380,13 @@ async function doLogout(){
 
 // Init Firebase auth listener
 setTimeout(()=>{
-  if(window._fb){
-    window._fb.onAuthStateChanged(window._fb.auth,u=>{
+  if(window._auth){
+    window._auth.onAuthStateChanged(u=>{
       currentUser=u;
       if(u){const cur=document.getElementById("s-login");if(cur.classList.contains("on")){afterLogin();}}
     });
   }
-},500);
+},300);
 
 // ═══════════════════════════════════════════════════════
 // ROUTING
