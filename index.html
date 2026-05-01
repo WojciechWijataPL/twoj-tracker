@@ -23,12 +23,15 @@
            updateDoc, setDoc, getDoc }
     from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-apiKey: "AIzaSyDEzOBQJ5DF7iocXbGCT9RrO04Y6wBUf4I",
-authDomain: "pierwszy-tracker.firebaseapp.com",
-projectId: "pierwszy-tracker",
-storageBucket: "pierwszy-tracker.firebasestorage.app",
-messagingSenderId: "188449164183",
-appId: "1:188449164183:web:24970bdb0132ed187e12d2"
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDEzOBQJ5DF7iocXbGCT9RrO04Y6wBUf4I",
+    authDomain:        "pierwszy-tracker.firebaseapp.com",
+    projectId:         "pierwszy-tracker",
+    storageBucket:     "pierwszy-tracker.firebasestorage.app",
+    messagingSenderId: "188449164183",
+    appId:             "1:188449164183:web:24970bdb0132ed187e12d2",
+    measurementId:     "G-HGNYF2NR89"
+  };
 
   // ⚠️ PO PIERWSZYM LOGOWANIU WKLEJ TU SWOJE UID (znajdziesz je po zalogowaniu w konsoli przeglądarki):
   const ADMIN_UID = "WKLEJ_SWOJE_UID";
@@ -49,7 +52,20 @@ html,body{height:100%;overflow-x:hidden}
 body{font-family:'DM Sans',system-ui,sans-serif;transition:background .3s,color .3s}
 body.dark{background:#0f172a;color:#fff}
 body.light{background:#f1f5f9;color:#1e293b}
-#app{max-width:420px;margin:0 auto;min-height:100vh;position:relative}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+@media(min-width:768px){
+  #app{max-width:860px}
+  .home-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .scr-inner{max-width:700px;margin:0 auto}
+  .scr-pad{padding:24px 32px 60px}
+  .hdr{padding:40px 32px 20px}
+  .ov{align-items:center}
+  .mod,.mod-d{max-width:520px;border-radius:18px;margin-bottom:40px}
+}
+@media(min-width:1100px){
+  #app{max-width:1100px}
+  .home-cards-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+}
 .scr{display:none;min-height:100vh}
 .scr.on{display:block}
 /* Header */
@@ -141,18 +157,13 @@ body.light{background:#f1f5f9;color:#1e293b}
         <button onclick="doLogout()" style="background:rgba(255,255,255,0.07);border:none;border-radius:10px;padding:8px 10px;cursor:pointer;color:rgba(255,255,255,0.5);font-size:12px;font-family:inherit">Wyloguj</button>
       </div>
     </div>
-    <div id="weather-box" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:22px" id="w-icon">⏳</span>
-      <div><div id="w-temp" style="font-size:14px;font-weight:700">Ładowanie...</div><div id="w-desc" style="font-size:11px;opacity:.5">Warszawa</div></div>
     </div>
-    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:11px;padding:10px 13px">
-      <span style="font-size:15px;margin-right:7px">◎</span><span style="font-size:13px;font-weight:700">Twój Tracker</span>
-      <div style="font-size:11px;opacity:.38;margin-top:2px">Finanse · Inwestycje · Trening · Cele</div>
+  </div>
     </div>
   </div>
   <div style="padding:0 14px 40px">
     <p style="font-size:11px;font-weight:700;opacity:.3;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">Twoje trackery</p>
-    <div id="hcards" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="hcards" class="home-cards-grid" style="gap:12px"></div>
   </div>
 </div>
 
@@ -183,7 +194,7 @@ body.light{background:#f1f5f9;color:#1e293b}
 
 <!-- INVEST -->
 <div id="s-invest" class="scr">
-  <div class="hdr" style="background:linear-gradient(135deg,#134e4a,#0d9488)">
+  <div class="hdr" style="background:linear-gradient(135deg,#92400e,#f59e0b)">
     <div class="hdr-deco"></div>
     <button class="back" onclick="go('home')">← Wróć</button>
     <div style="color:#fff;font-size:19px;font-weight:800;margin-bottom:3px">📈 Inwestycje</div>
@@ -203,7 +214,7 @@ body.light{background:#f1f5f9;color:#1e293b}
     <div class="tabs" id="itabs"></div>
     <div id="ic"></div>
   </div>
-  <button class="fab" style="background:linear-gradient(135deg,#0d9488,#134e4a);box-shadow:0 4px 14px rgba(13,148,136,0.4)" onclick="openIM()">+</button>
+  <button class="fab" style="background:linear-gradient(135deg,#f59e0b,#92400e);box-shadow:0 4px 14px rgba(245,158,11,0.4)" onclick="openIM()">+</button>
 </div>
 
 <!-- WORKOUT -->
@@ -437,8 +448,7 @@ function cct(){return dc()?"ct-d":"ct-l";}
 // ═══════════════════════════════════════════════════════
 // HOME
 // ═══════════════════════════════════════════════════════
-async function loadWeather(){
-  try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=52.23&longitude=21.01&current=temperature_2m,weathercode&timezone=Europe/Warsaw");const d=await r.json();const t=Math.round(d.current.temperature_2m);const code=d.current.weathercode;const icon=code<=1?"☀️":code<=3?"⛅":code<=48?"🌫️":code<=67?"🌧️":code<=77?"❄️":code<=82?"🌦️":"⛈️";const desc=code<=1?"Słonecznie":code<=3?"Pochmurno":code<=48?"Mglisto":code<=67?"Deszcz":code<=77?"Śnieg":code<=82?"Przelotnie":"Burza";document.getElementById("w-icon").textContent=icon;document.getElementById("w-temp").textContent=`${t}°C — ${desc}`;document.getElementById("w-desc").textContent="Warszawa, Polska";}catch{document.getElementById("w-icon").textContent="🌤️";document.getElementById("w-temp").textContent="Brak danych pogodowych";}
+°C — ${desc}`;document.getElementById("w-desc").textContent="Warszawa, Polska";}catch{document.getElementById("w-icon").textContent="🌤️";document.getElementById("w-temp").textContent="Brak danych pogodowych";}
 }
 
 function renderHome(){
@@ -458,12 +468,12 @@ function renderHome(){
   const td=tasks.filter(t=>t.planDate===today());
   const cards=[
     {id:"finance",icon:"💰",title:"Tracker Finansowy",sub:`${exp.toFixed(0)} zł wydatków w tym miesiącu`,grad:"linear-gradient(135deg,#1e3a5f,#2563eb)",stat:(bal>=0?"+":"")+fmt(Math.abs(bal)),sc:bal>=0?"#86efac":"#fca5a5"},
-    {id:"invest",icon:"📈",title:"Inwestycje",sub:`Portfolio: ${fmt(invT)}`,grad:"linear-gradient(135deg,#134e4a,#0d9488)",stat:fmt(invT),sc:"#5eead4"},
+    {id:"invest",icon:"📈",title:"Inwestycje",sub:`Portfolio: ${fmt(invT)}`,grad:"linear-gradient(135deg,#92400e,#f59e0b)",stat:fmt(invT),sc:"#5eead4"},
     {id:"workout",icon:"🏋️",title:"Tracker Treningów",sub:`${wk} treningów w tym tygodniu`,grad:"linear-gradient(135deg,#1e1b4b,#7c3aed)",stat:`${wk} treningów`,sc:"#e9d5ff"},
-    {id:"goals",icon:"🎯",title:"Cele & Nawyki",sub:`Streak ${streak} dni · ${td.filter(t=>t.done).length}/${td.length} dziś`,grad:"linear-gradient(135deg,#064e3b,#10b981)",stat:`${streak}d 🔥`,sc:"#86efac"},
+    {id:"goals",icon:"🎯",title:"Cele & Nawyki",sub:`Streak ${streak} dni · ${td.filter(t=>t.done).length}/${td.length} dziś`,grad:"linear-gradient(135deg,#4c0519,#e11d48)",stat:`${streak}d 🔥`,sc:"#86efac"},
   ];
   document.getElementById("hcards").innerHTML=cards.map(c=>`<button onclick="go('${c.id}')" style="background:${c.grad};border:none;border-radius:16px;padding:16px 18px;cursor:pointer;text-align:left;position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,0.22);width:100%;transition:transform .12s" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform='scale(1)'"><div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:20px;margin-bottom:7px">${c.icon}</div><div style="color:#fff;font-size:15px;font-weight:800;margin-bottom:3px">${c.title}</div><div style="color:rgba(255,255,255,0.55);font-size:12px">${c.sub}</div></div><div style="text-align:right;flex-shrink:0;margin-left:10px"><div style="color:${c.sc};font-size:13px;font-weight:800">${c.stat}</div></div></div></button>`).join("");
-  loadWeather();
+  
 }
 
 function calcStreak(){let s=0,d=new Date();for(let i=0;i<365;i++){const ds=d.toISOString().split("T")[0];if(habits.length>0&&habits.every(h=>habitLogs[h.id]&&habitLogs[h.id].includes(ds)))s++;else if(i>0)break;d.setDate(d.getDate()-1);}return s;}
