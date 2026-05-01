@@ -100,57 +100,27 @@ body.light{background:#f1f5f9;color:#1e293b}
 .login-wrap{min-height:100vh;background:linear-gradient(160deg,#0f172a,#1e3a5f);display:flex;align-items:center;justify-content:center;padding:20px}
 .login-card{width:100%;max-width:360px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:26px}
 
-/* Ukryj pogodę, kafelek, napis */
 #weather-box{display:none!important}
 #home-hdr > div:last-child{display:none!important}
-#s-home > div:last-child > p{display:none!important}
-
-/* Fix przełączania ekranów - KLUCZOWE */
+p[style*="TWOJE TRACKERY"],p[style*="uppercase"]{display:none!important}
 .scr.on{display:block!important}
-
-/* TELEFON - 2 kolumny */
-@media(max-width:699px){
-  #hcards{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
-  #hcards button{width:100%!important;min-height:130px}
-}
-
-/* LAPTOP/DESKTOP */
 @media(min-width:700px){
-  body,#app{margin:0;padding:0}
   #app{max-width:100%;background:#0f172a}
-
-  /* Home - header + karty zajmują cały viewport */
-  #s-home{height:100vh;display:flex!important;flex-direction:column}
-  #home-hdr{padding:28px 40px 16px;flex-shrink:0}
-  #s-home > div:last-child{
-    flex:1;display:flex;flex-direction:column;justify-content:flex-start;
-    padding:12px 40px 40px
-  }
-  #hcards{
-    display:grid!important;
-    grid-template-columns:repeat(2,1fr)!important;
-    grid-template-rows:repeat(2,1fr)!important;
-    gap:16px!important;
-    flex:1;height:100%
-  }
-  #hcards button{
-    width:100%!important;
-    height:100%!important;
-    min-height:160px;
-    font-size:16px
-  }
-
-  /* Trackery - wyśrodkowane */
+  #home-hdr{max-width:960px;margin:0 auto;padding:32px 32px 20px}
+  #s-home > div:last-child{max-width:960px;margin:0 auto;padding:0 32px 40px}
+  #hcards{display:grid!important;grid-template-columns:repeat(2,1fr);gap:16px!important}
+  #hcards button{width:100%!important}
+}
+@media(min-width:1100px){
+  #home-hdr{max-width:1200px}
+  #s-home > div:last-child{max-width:1200px}
+  #hcards{grid-template-columns:repeat(4,1fr)!important}
+}
+@media(min-width:700px){
   .scr-pad{max-width:860px;margin:0 auto;padding:20px 32px 60px}
   .hdr{max-width:860px;margin:0 auto}
   .ov{align-items:center}
   .mod,.mod-d{max-width:500px;border-radius:18px}
-}
-
-@media(min-width:1200px){
-  #home-hdr{padding:32px 60px 16px}
-  #s-home > div:last-child{padding:12px 60px 40px}
-  #hcards{grid-template-columns:repeat(4,1fr)!important;grid-template-rows:1fr!important}
 }
 </style>
 </head>
